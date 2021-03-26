@@ -1,7 +1,7 @@
 # coding:utf-8
 
 import numpy as np
-from ch01.functions import softmax, cross_entropy_error
+from common.functions import softmax, cross_entropy_error
 
 
 class Affine:

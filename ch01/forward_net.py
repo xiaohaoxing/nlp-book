@@ -1,4 +1,4 @@
-from ch01.functions import *
+from common.functions import *
 from common.layers import TwoLayerNet
 
 if __name__ == '__main__':

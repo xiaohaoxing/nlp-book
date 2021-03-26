@@ -168,3 +168,47 @@ def to_gpu(x):
     if type(x) == cupy.ndarray:
         return x
     return cupy.asarray(x)
+
+
+def query_vec_similarity(query_vec, word_to_id, id_to_word, word_vecs, top=5):
+    vocab_size = len(id_to_word)
+    similarity = np.zeros(vocab_size)
+    test = cos_similarity(word_vecs[word_to_id['better']], query_vec)
+    print('target with better:' + str(test))
+    for i in range(vocab_size):
+        similarity[i] = cos_similarity(word_vecs[i], query_vec)
+    count = 0
+    for i in (-1 * similarity).argsort():
+        print(' %s: %s' % (id_to_word[i], similarity[i]))
+        count += 1
+        if count >= top:
+            return
+
+
+def analogy(src1, tar1, src2, word_to_id, id_to_word, word_vecs, top=5):
+    src1_id = word_to_id[src1]
+    tar1_id = word_to_id[tar1]
+    src2_id = word_to_id[src2]
+    query_vec = word_vecs[src2_id] + word_vecs[tar1_id] - word_vecs[src1_id]
+    print('\n[query]%s to %s like %s to what?' % (src1, tar1, src2))
+    vocab_size = len(id_to_word)
+    similarity = np.zeros(vocab_size)
+    for i in range(vocab_size):
+        similarity[i] = cos_similarity(word_vecs[i], query_vec)
+
+    count = 0
+    for i in (-1 * similarity).argsort():
+        if i != src1_id and i != tar1_id and i != src2_id:
+            print(' %s: %s' % (id_to_word[i], similarity[i]))
+
+            count += 1
+            if count >= top:
+                return
+
+
+def analogy_middle(left, right, word_to_id, id_to_word, word_vecs, top=5):
+    left_id = word_to_id[left]
+    right_id = word_to_id[right]
+    query_vec = (word_vecs[left_id] + word_vecs[right_id]) / 2
+    print('find word between %s and %s' % (left, right))
+    query_vec_similarity(query_vec, word_to_id, id_to_word, word_vecs, top)
