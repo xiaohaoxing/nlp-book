@@ -311,7 +311,7 @@ class TimeLSTM:
         N, T, H = dhs.shape
         D = Wx.shape[0]
 
-        dxs = np.zeros((N, T, D), dtype='f')
+        dxs = np.empty((N, T, D), dtype='f')
         dh, dc = 0, 0
         grads = [0, 0, 0]
         for t in reversed(range(T)):
