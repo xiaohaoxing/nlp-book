@@ -40,18 +40,18 @@ class Decoder:
         rn = np.random.randn
 
         embed_W = (rn(V, D) / 100).astype('f')
-        lstm_Wx = (rn(D, H * 4) / np.sqrt(D)).astype('f')
-        lstm_Wh = (rn(D, H * 4) / np.sqrt(H)).astype('f')
-        lstm_b = np.zeros(H * 4).astype('f')
+        lstm_Wx = (rn(D, 4 * H) / np.sqrt(D)).astype('f')
+        lstm_Wh = (rn(H, 4 * H) / np.sqrt(H)).astype('f')
+        lstm_b = np.zeros(4 * H).astype('f')
         affine_W = (rn(H, V) / np.sqrt(H)).astype('f')
         affine_b = np.zeros(V).astype('f')
 
         self.embed = TimeEmbedding(embed_W)
-        self.lstm = TimeLSTM(lstm_Wx, lstm_Wh, lstm_b, stateful=False)
+        self.lstm = TimeLSTM(lstm_Wx, lstm_Wh, lstm_b, stateful=True)
         self.affine = TimeAffine(affine_W, affine_b)
 
         self.params, self.grads = [], []
-        for layer in [self.embed, self.lstm, self.affine]:
+        for layer in (self.embed, self.lstm, self.affine):
             self.params += layer.params
             self.grads += layer.grads
 
@@ -74,6 +74,7 @@ class Decoder:
         sampled = []
         sample_id = start_id
         self.lstm.set_state(h)
+
         for _ in range(sample_size):
             x = np.array(sample_id).reshape((1, 1))
             out = self.embed.forward(x)
@@ -82,6 +83,9 @@ class Decoder:
 
             sample_id = np.argmax(score.flatten())
             sampled.append(int(sample_id))
+
+        return sampled
+
 
 
 class Seq2Seq(BaseModel):
