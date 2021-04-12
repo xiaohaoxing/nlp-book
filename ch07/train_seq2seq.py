@@ -12,6 +12,9 @@ from ch07.seq2seq import Seq2Seq
 (x_train, t_train), (x_test, t_test) = sequence.load_data('addition.txt')
 char_to_id, id_to_char = sequence.get_vocab()
 
+# 翻转输入
+x_train, x_test = x_train[:, ::-1], x_test[:, ::-1]
+
 vocab_size = len(char_to_id)
 wordvec_size = 16
 hidden_size = 128
